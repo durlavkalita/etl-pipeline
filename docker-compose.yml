@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  etl-runner:
+    image: python:3.10-slim
+    container_name: etl-runner
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    command: sh -c "pip install -r requirements.txt && python etl/main.py"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+
+  test:
+    image: python:3.10-slim
+    container_name: etl-test
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    command: sh -c "pip install -r requirements.txt && pytest"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+
+volumes:
+  mongo-data:
