@@ -1,2 +1,3 @@
 pymongo
 pytest
+prometheus_client

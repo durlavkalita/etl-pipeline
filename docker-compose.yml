@@ -13,6 +13,8 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+    ports:
+      - "8000:8000"
     depends_on:
       - mongo
     command: sh -c "pip install -r requirements.txt && python etl/main.py"
@@ -31,5 +33,22 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
 volumes:
   mongo-data:
+  grafana-storage:
